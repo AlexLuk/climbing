@@ -1,4 +1,4 @@
-package com.polytexnik.climbing;
+package com.polytechnic.climbing;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

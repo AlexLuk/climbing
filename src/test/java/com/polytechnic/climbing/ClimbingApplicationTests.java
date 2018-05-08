@@ -1,4 +1,4 @@
-package com.polytexnik.climbing;
+package com.polytechnic.climbing;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
