@@ -1,0 +1,17 @@
+CREATE TABLE IF NOT EXISTS  area (
+  area_id SERIAL PRIMARY KEY NOT NULL,
+  title       VARCHAR(225)
+);
+
+CREATE TABLE IF NOT EXISTS  crag (
+  crag_id SERIAL PRIMARY KEY NOT NULL,
+  area_id INT REFERENCES area (area_id) ON DELETE CASCADE NOT NULL,
+  title       VARCHAR(225)
+);
+
+CREATE TABLE IF NOT EXISTS  route (
+  route_id SERIAL PRIMARY KEY NOT NULL,
+  crag_id INT REFERENCES crag (crag_id) ON DELETE CASCADE NOT NULL,
+  title       VARCHAR(225),
+  category    VARCHAR(5)
+);
