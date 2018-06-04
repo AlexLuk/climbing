@@ -10,6 +10,17 @@ buildscript {
 	}
 }
 
+plugins {
+	id "org.flywaydb.flyway" version "5.1.1"
+}
+
+flyway {
+	url = 'jdbc:postgresql://localhost:5432/marathon'
+	user = 'climber'
+	password = 'climbingismylife'
+	schemas = ['public']
+}
+
 apply plugin: 'java'
 apply plugin: 'eclipse'
 apply plugin: 'org.springframework.boot'
