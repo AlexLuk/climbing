@@ -10,12 +10,8 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/")
 public class AreaController {
 
-    private final AreaService areaService;
-
     @Autowired
-    public AreaController(AreaService areaService) {
-        this.areaService = areaService;
-    }
+    private AreaService areaService;
 
     @GetMapping("/area/{areaId}")
     public AreaDto getAreaById(@PathVariable Long areaId) {
