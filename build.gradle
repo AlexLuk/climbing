@@ -1,24 +1,33 @@
+import groovy.transform.Field
+
+
 buildscript {
-	ext {
-		springBootVersion = '2.0.1.RELEASE'
-	}
-	repositories {
-		mavenCentral()
-	}
-	dependencies {
-		classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
-	}
+    ext {
+        springBootVersion = '2.0.1.RELEASE'
+    }
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+    }
 }
 
 plugins {
-	id "org.flywaydb.flyway" version "5.1.1"
+    id "org.flywaydb.flyway" version "5.1.1"
+    id 'nu.studer.jooq' version '2.0.9'
 }
 
+@Field private String schema = 'public'
+@Field private String connection = 'jdbc:postgresql://localhost:5432/marathon'
+@Field private String pass = 'climbingismylife'
+@Field private String userName = 'climber'
+
 flyway {
-	url = 'jdbc:postgresql://localhost:5432/marathon'
-	user = 'climber'
-	password = 'climbingismylife'
-	schemas = ['public']
+    url = connection
+    user = userName
+    password = pass
+    schemas = [schema]
 }
 
 apply plugin: 'java'
@@ -31,15 +40,64 @@ version = '0.0.1-SNAPSHOT'
 sourceCompatibility = 1.8
 
 repositories {
-	mavenCentral()
+    mavenCentral()
+}
+
+jooq {
+    version = '3.10.4' // the default (can be omitted)
+    edition = 'OSS'    // the default (can be omitted), other allowed values are PRO, PRO_JAVA_6, and TRIAL
+    marathon(sourceSets.main) {
+        jdbc {
+            driver = 'org.postgresql.Driver'
+            url = connection
+            user = userName
+            password = pass
+        }
+        generator {
+            name = 'org.jooq.util.DefaultGenerator'
+            strategy {
+                name = 'org.jooq.util.DefaultGeneratorStrategy'
+            }
+            database {
+                name = 'org.jooq.util.postgres.PostgresDatabase'
+                inputSchema = schema
+                forcedTypes {
+                    forcedType {
+                        name = 'varchar'
+                        expression = '.*'
+                        types = 'JSONB?'
+                    }
+                    forcedType {
+                        name = 'varchar'
+                        expression = '.*'
+                        types = 'INET'
+                    }
+                }
+            }
+            generate {
+                relations = true
+                deprecated = false
+                records = true
+                immutablePojos = true
+                fluentSetters = true
+            }
+            target {
+                packageName = 'models.test'
+            }
+        }
+    }
 }
 
 
 dependencies {
-	compile('org.springframework.boot:spring-boot-starter-data-jpa')
-	compile('org.springframework.boot:spring-boot-starter-web')
-	compile('org.flywaydb:flyway-core')
-	runtime('org.postgresql:postgresql')
-	compileOnly('org.projectlombok:lombok')
-	testCompile('org.springframework.boot:spring-boot-starter-test')
+    compile('org.springframework.boot:spring-boot-starter-data-jpa')
+    compile('org.jooq:jooq:jar:3.10.7')
+    compile('org.jooq:jooq-meta:jar:3.10.7')
+    compile('org.jooq:jooq-codegen:jar:3.10.7')
+    compile('org.springframework.boot:spring-boot-starter-web')
+    compile('org.flywaydb:flyway-core')
+    runtime('org.postgresql:postgresql')
+    compileOnly('org.projectlombok:lombok')
+    testCompile('org.springframework.boot:spring-boot-starter-test')
+    jooqRuntime 'postgresql:postgresql:9.1-901.jdbc4'
 }
